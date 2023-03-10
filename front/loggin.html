@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="row g-2">
+        <div class="col-md">
+            <div class="form-floating">
+                <input type="text" class="form-control" id="uname" placeholder="name@example.com">
+                <label for="uname">Username</label>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="form-floating">
+                <input type="text" class="form-control" id="pwd" placeholder="Password">
+                <label for="pwd">Password</label>
+            </div>
+
+        </div>
+        <div class="col-md">
+            <div class="form-floating">
+                <button class="btn btn-secondary mb-2" id="logbutton" style="height: 56px;" onclick="login()">Log-in</button>
+            </div>
+        </div>
+    </div>
+    <div class="row g-2">
+        <div class="col-md">
+
+            <button class="btn btn-light" id="reg">
+                <a href="register.html">Not Registered ? click here to register.</a>
+            </button>
+
+        </div>
+    </div>
+
+
+    <!--posting username and possword to back-end server, if all is good then result.data.access is saved to myToken and then to localStorage-->
+    <script>
+
+        MY_SERVER = "http://127.0.0.1:8000/"
+        let myToken = ""
+
+        const login = async() => {
+            await axios.post(MY_SERVER + "login/", 
+            {
+                "username": uname.value,
+                "password": pwd.value
+
+
+            }).then((res) => (myToken = res.data.access)) // we ask here for access (in data we have access & refresh)
+            console.log(myToken)
+            localStorage.setItem("Access Token Database", JSON.stringify(myToken))
+            //JSON.stringify() is a method in JavaScript that converts a JavaScript object or value to a JSON string. 
+            //In this case, it is used to convert the myToken variable to a JSON string so that it can be stored in localStorage.
+            // if no access error above, we will reach this href and go to school.
+            window.location.href = 'school.html'
+        }
+        
+
+
+
+    </script>
+
+
+</body>
+
+</html>

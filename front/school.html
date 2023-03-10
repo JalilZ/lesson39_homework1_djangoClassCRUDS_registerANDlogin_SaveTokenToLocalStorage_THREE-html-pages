@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <meta http-equiv="Permissions-Policy" content="interest-cohort=()">
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
+    <title>Document</title>
+</head>
+
+<body>
+
+    <div class="input-group">
+        <input type="text" placeholder="Student Name" class="form-control" id="sname">
+        <input type="number" placeholder="Student Age" class="form-control" id="sage">
+        <input type="file" placeholder="Profile Picture" class="form-control" id="spic">
+        <button type="button" class="btn btn-outline-primary" onclick="addstudent()">Add</button>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col" style="text-align:center;">#</th>
+                <th scope="col" style="text-align:center;">Student Name</th>
+                <th scope="col" style="text-align:center;">Student Age</th>
+                <th scope="col" style="text-align:center;">Picture</th>
+                <th scope="col" style="text-align:center;">Created Time</th>
+                <th scope="col" style="text-align:center;">Update</th>
+                <th scope="col" style="text-align:center;">Delete</th>
+            </tr>
+        </thead>
+        <tbody id="display">
+            <!--here the innerhtml table-->
+        </tbody>
+    </table>
+
+
+
+    <script>
+        const MY_SERVER = "http://127.0.0.1:8000/students/" // had to add last slash else I receive CORS error
+        myToken = JSON.parse(localStorage.getItem("Access Token Database"))
+        console.log(myToken)
+
+        const loadData = async () => {
+
+            // we save the token in myToken (JSON from local storage), now each time we call this CRUD, a verification is in effect
+            const config = {
+                headers: { Authorization: `Bearer ${myToken}` }
+            };
+
+            res = await axios.get(MY_SERVER, config)    // config for authentication
+            console.log(res.data)
+            display.innerHTML = ''
+            res.data.forEach((element) => {
+                row =
+                    `<td style="text-align:center;">${element.id}</td>
+                <td style="text-align:center;">${element.name}</td>
+                <td style="text-align:center;">${element.age}</td>
+                <td style="text-align:center;"><img src=../static${element.image} width="30" height="30"></td>
+                <td style="text-align:center;">${element.createdTime}</td>
+                <td style="text-align:center;"><button type="button" class="btn btn-warning" onclick="upstudent(${element.id})">Update</button></td>
+                <td style="text-align:center;"><button type="button" class="btn btn-danger" onclick="delstudent(${element.id})">Delete</button></td>
+                `
+
+                display.innerHTML += row
+            })
+        }
+        loadData()
+
+        function delstudent(id) {
+            // we save the token in myToken (JSON from local storage), now each time we call this CRUD, a verification is in effect
+            const config = {
+                headers: { Authorization: `Bearer ${myToken}` }
+            };
+
+            axios.delete(MY_SERVER + id, config).then(result => {             // config for authentication
+                console.log(result.data);
+                loadData();
+            }
+            ).catch(error => console.log(error));
+
+        }
+
+        const upstudent = (id) => {
+            // we save the token in myToken (JSON from local storage), now each time we call this CRUD, a verification is in effect
+            const config = {
+                headers: { Authorization: `Bearer ${myToken}` }
+            };
+
+
+
+            const formData = new FormData();        //  FormData is a class in browser (type is array, so we can append it),
+            //  we access it via JS, we save it in parameter formData
+            //  formdata is an array (will include 3 elements in our case)
+            //  once we append the array, we put/post to server as we typically know.
+            formData.append("name", sname.value);
+            formData.append("age", sage.value);
+            formData.append("image", spic.files[0]); //append only the first picture the user uploaded (don't append more if the user uploaded many)
+
+            axios.put(MY_SERVER + id, formData, config).then(result => {          // config for authentication
+                console.log(result.data);
+                loadData();
+            }).catch(error => console.log(error));
+        }
+
+
+        const addstudent = () => {
+
+            // we save the token in myToken (JSON from local storage), now each time we call this CRUD, a verification is in effect
+            const config = {
+                headers: { Authorization: `Bearer ${myToken}` }
+            };
+
+
+            const formData = new FormData();
+
+            formData.append("name", sname.value);
+            formData.append("age", sage.value);
+            formData.append("image", spic.files[0]);
+
+            axios.post(MY_SERVER, formData, config).then(result => {              // config for authentication
+                console.log(result.data);
+                loadData();
+            }).catch(error => console.log(error));
+        }
+
+        // CHATGPT: addstudent & upstudent function, you are sending the file object directly as a part of the JSON payload, which will not work. 
+        // You need to use the FormData API to properly construct the payload with the file, like so above
+
+        //const upstudent = (id) => {
+        //    axios.put(MY_SERVER + id, { "name": sname.value, "age": sage.value }).then(result => {
+        //        console.log(result.data);
+        //        loadData();
+        //    }
+        //    ).catch(error => console.log(error));
+        //}
+
+        //const addstudent = () => {
+        //    axios.post(MY_SERVER, { "name": sname.value, "age": sage.value }).then(result => {
+        //        console.log(result.data);
+        //        loadData();
+        //    }
+        //    ).catch(error => console.log(error));
+
+        //}
+    </script>
+
+
+
+</body>
+
+</html>
